@@ -1,48 +1,45 @@
-# Testing Microservices in Spring
+# Testing Spring Boot Application
 
-[![Build Status](https://travis-ci.org/hamvocke/spring-testing.svg?branch=master)](https://travis-ci.org/hamvocke/spring-testing)
+[![Build Status](https://travis-ci.org/eduardoperrino/testing-hub.svg?branch=master)](https://travis-ci.org/eduardoperrino/testing-hub)
 
-This repository contains a *Spring Boot* application with lots of exemplary tests on different levels of the [Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html). It shows an opinionated way to thoroughly test your spring application by demonstrating different types and levels of testing. You will find that some of the tests are duplicated along the test pyramid -- concepts that have already been tested in lower-level tests will be tested in more high-level tests. This contradicts the premise of the test pyramid. In this case it helps showcasing different kinds of tests which is the main goal of this repository.
+Este repositorio contiene una aplicación *Spring Boot* con una serie de ejemplos de testing que tratan de mostrar los diferentes niveles definidos en la denominada [Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html). Intenta mostrar una manera de probar a fondo una aplicación basada en *Spring* demostrando los diferente tipos y niveles de testing. Es importante tener en cuenta que su objetivo es meramenta educativo, con lo que se podrá encontrar algunos tests duplicados o conceptos ya testeados en un menor nivel en un nivel más alto contradiciendo la premisa de [Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html).
 
-## Read the Blog Post
-This repository is part of a [series of blog posts](http://www.hamvocke.com/blog/testing-microservices/) I wrote about testing microservices. I highly recommend you read them to get a better feeling for what it takes to test microservices and how you can implement a reliable test suite for a Spring Boot microservice application.
+## Empezamos
 
-## Get started
+### 1. Configurar una API Key como Variable de Entorno
+Para ejecutar el servicio, se necesita definitir la variable de entorno `WEATHER_API_KEY` con una API key valida obtenida en [darksky.net](http://darksky.net).
 
-### 1. Set an API Key as Environment Variable
-In order to run the service, you need to set the `WEATHER_API_KEY` environment variable to a valid API key retrieved from [darksky.net](http://darksky.net).
-
-A simple way is to rename the `env.sample` file to `.env`, fill in your API key from `darksky.net` and source it before running your application:
+Una forma sencilla para hacer esto es renombrar como `.env` el fichero `env.sample` con la API key de `darksky.net` y ejecutar el fichero antes de lanzar tu aplicación:
 
 ```bash
 source .env
 ```
 
-### 2. Start a PostgreSQL database
-The easiest way is to use the provided `startDatabase.sh` script. This script starts a Docker container which contains a database with the following configuration:
+### 2. Arrancar una base de datos PostgreSQL
+La forma más sencilla para realizar este paso es utilizar el script `startDatabase.sh` incluído. Este script arranca un contenedor Docker que contiene una base de datos con la siguiente configuración:
     
   * port: `1543`
   * username: `postgres`
   * password: `password`
   * database name: `postgres`
-  
-If you don't want to use the script make sure to have a database with the same configuration or modify your `application.properties`.
 
-### 3. Run the Application
-Once you've provided the API key and started a PostgreSQL database you can run the application using
+Si no quieres utilizar este script asegúrate que la base de datos tiene la misma configuración que está definida en tu `application.properties`.
+
+### 3. Arranca la aplicación
+Una vez que has definido la API key e iniciada la base de datos PostgreSQL puedes arrancar la aplicación lanzando
 
 ```bash
 ./gradlew bootRun
 ```
 
-The application will start on port `8080` so you can send a sample request to `http://localhost:8080/hello` to see if you're up and running.
+La aplicación arrancará en el puerto `8080`, para probar que se ha levantado y se está ejecutando correctamente puedes lanzar la siguiente petición de prueba `http://localhost:8080/hello`.
 
 
-## Application Architecture
+## Arquitectura de la aplicación (Application Architecture)
 
 ```
  ╭┄┄┄┄┄┄┄╮      ┌──────────┐      ┌──────────┐
- ┆   ☁   ┆  ←→  │    ☕     │  ←→  │    💾    │
+ ┆   ☁   ┆  ←→  │    ☕     │  ←→  │          │
  ┆  Web  ┆ HTTP │  Spring  │      │ Database │
  ╰┄┄┄┄┄┄┄╯      │  Service │      └──────────┘
                 └──────────┘
@@ -54,19 +51,18 @@ The application will start on port `8080` so you can send a sample request to `h
                 │   API    │
                 └──────────┘
 ```
+La aplicación de ejemplo se ha intentado hacer de la forma más sencilla posible. Almacena `Person`s en una base de datos (utilizando _Spring Data_) y ofrece una interfaz _REST_ con tres endpoints:
 
-The sample application is almost as easy as it gets. It stores `Person`s in an in-memory database (using _Spring Data_) and provides a _REST_ interface with three endpoints:
+  * `GET /hello`: Devuelve _"Hello World!"_. Siempre.
+  * `GET /hello/{lastname}`: Busca la persona con `lastname` como su last name y devuelve _"Hello {Firstname} {Lastname}"_ si encuentra la persona.
+  * `GET /weather`: Llama a [weather API](https://darksky.net) via HTTP and devuelve el resumen de las actuales condiciones meteorológicas en Bilbao
 
-  * `GET /hello`: Returns _"Hello World!"_. Always.
-  * `GET /hello/{lastname}`: Looks up the person with `lastname` as its last name and returns _"Hello {Firstname} {Lastname}"_ if that person is found.
-  * `GET /weather`: Calls a downstream [weather API](https://darksky.net) via HTTP and returns a summary for the current weather conditions in Hamburg, Germany
+### Arquitectura Interna (Internal Architecture)
+Este **Spring Service** tiene una arquitectura interna bastante común:
 
-### Internal Architecture
-The **Spring Service** itself has a pretty common internal architecture:
-
-  * `Controller` classes provide _REST_ endpoints and deal with _HTTP_ requests and responses
-  * `Repository` classes interface with the _database_ and take care of writing and reading data to/from persistent storage
-  * `Client` classes talk to other APIs, in our case it fetches _JSON_ via _HTTP_ from the darksky.net weather API
+  * `Controller` clases que contienen los endpoint _REST_  y se ocupan de las peticiones y respuestas _HTTP_
+  * `Repository` clases que interactúan con la _base de datos_ y se encargan de escribir y leer en/desde la almacenamiento persistente
+  * `Client` clases que hablan con otras APIs, en nuestro caso recuperan datos en formato _JSON_ via _HTTP_ del weather API de darksky.net
 
 
   ```
@@ -88,8 +84,8 @@ The **Spring Service** itself has a pretty common internal architecture:
                 └──────────┘
   ```  
 
-## Test Layers
-The example applicationn shows different test layers according to the [Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html).
+## Capas de Testing (Test Layers)
+La aplicación de ejemplo muestra las diferentes capas de testing de acerdo a [Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html). 
 
 ```
       ╱╲
@@ -102,9 +98,10 @@ The example applicationn shows different test layers according to the [Test Pyra
 ──────────────
 ```
 
-The base of the pyramid is made up of unit tests. They should make the biggest part of your automated test suite.
+La base de la pirámide esta compuesta por los tests unitarios. Deben de ser la parte más grande del conjunto de pruebas automatizadas.
 
-The next layer, integration tests, test all places where your application serializes or deserializes data. Your service's REST API, Repositories or calling third-party services are good examples. This codebase contains example for all of these tests.
+
+En la siguiente capa se encuentran los test de integración. Pruebas todas las partes de la aplicación donde se serializan o deserializan datos. Tu REST API, Repositorios y llamadas a servicios de terceros son buenos ejemplos. En el código podrás ver ejemplos de todos estos tests.
 
 ```
  ╭┄┄┄┄┄┄┄╮      ┌──────────┐      ┌──────────┐
@@ -136,8 +133,8 @@ The next layer, integration tests, test all places where your application serial
  └──────────┘ ─┘
 ```
 
-## Tools
-You can find lots of different tools, frameworks and libraries being used in the different examples:
+## Herramientas
+A lo largo de los ejemplos podrás ver que se han utilizado las siguientes herramientas, frameworks y librerias:
 
   * **Spring Boot**: application framework
   * **JUnit**: test runner
