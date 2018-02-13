@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -37,6 +38,11 @@ public class ExampleControllerTest {
     @Test
     public void shouldReturnHelloWorld() throws Exception {
         assertThat(subject.hello(), is("Hello World!"));
+    }
+
+    @Test
+    public void shouldReturnByeBye() throws Exception {
+        assertTrue(true);
     }
 
     @Test

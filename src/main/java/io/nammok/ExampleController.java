@@ -28,6 +28,11 @@ public class ExampleController {
         return "Hello World!";
     }
 
+    @GetMapping("/byebye")
+    public String byebye() {
+        return "ByeBye!";
+    }
+
     @GetMapping("/hello/{lastName}")
     public String hello(@PathVariable final String lastName) {
         Optional<Person> foundPerson = personRepository.findByLastName(lastName);
