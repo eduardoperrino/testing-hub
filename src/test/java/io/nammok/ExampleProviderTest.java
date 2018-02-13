@@ -6,10 +6,10 @@ import au.com.dius.pact.provider.junit.State;
 import au.com.dius.pact.provider.junit.loader.PactFolder;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import au.com.dius.pact.provider.spring.target.MockMvcTarget;
+import io.nammok.controller.PersonController;
 import io.nammok.person.Person;
 import io.nammok.person.PersonRepository;
 import io.nammok.weather.WeatherClient;
-import io.nammok.ExampleController;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,10 +33,7 @@ public class ExampleProviderTest {
     @Mock
     private PersonRepository personRepository;
 
-    @Mock
-    private WeatherClient weatherClient;
-
-    private ExampleController exampleController;
+    private PersonController personController;
 
     @TestTarget
     public final MockMvcTarget target = new MockMvcTarget();
@@ -44,8 +41,8 @@ public class ExampleProviderTest {
     @Before
     public void before() {
         initMocks(this);
-        exampleController = new ExampleController(personRepository, weatherClient);
-        target.setControllers(exampleController);
+        personController = new PersonController(personRepository);
+        target.setControllers(personController);
     }
 
     @State("person data") // same as the "given()" part in our consumer test
