@@ -40,6 +40,13 @@ public class ExampleControllerAPITest {
     }
 
     @Test
+    public void shouldReturnByeBye() throws Exception {
+        mockMvc.perform(get("/byebye"))
+                .andExpect(content().string("ByeBye!"))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     public void shouldReturnFullName() throws Exception {
         Person peter = new Person("Peter", "Pan");
         given(personRepository.findByLastName("Pan")).willReturn(Optional.of(peter));
